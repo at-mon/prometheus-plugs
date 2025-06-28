@@ -149,14 +149,14 @@ defmodule Prometheus.PlugExporter do
                     ]
                   )
 
-                {format.content_type, format}
+                {format.content_type(), format}
               rescue
                 ErlangError ->
                   {unquote(:prometheus_text_format.content_type()), :prometheus_text_format}
               end
             end
           else
-            {format.content_type, format}
+            {format.content_type(), format}
           end
         )
       end

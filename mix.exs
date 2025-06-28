@@ -2,13 +2,13 @@ defmodule PrometheusPlugs.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/deadtrickster/prometheus-plugs"
-  @version "1.1.5"
+  @version "1.2.0"
 
   def project do
     [
       app: :prometheus_plugs,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.18",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -51,11 +51,11 @@ defmodule PrometheusPlugs.Mixfile do
 
   defp deps do
     [
-      {:accept, "~> 0.1"},
-      {:plug, "~> 1.0"},
-      {:prometheus_ex, "~> 1.1 or ~> 2.0 or ~> 3.0"},
-      {:prometheus_process_collector, "~> 1.1", optional: true},
-
+      {:accept, "~> 0.3"},
+      {:plug, "~> 1.18"},
+      {:prometheus, "~> 5.1", override: true},
+      {:prometheus_ex, "~> 4.0", override: true},
+      {:prometheus_process_collector, "~> 1.6", optional: true},
       {:earmark, ">= 0.0.0", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
