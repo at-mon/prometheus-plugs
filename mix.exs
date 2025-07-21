@@ -24,7 +24,7 @@ defmodule PrometheusPlugs.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :prometheus_ex, :accept]]
+    [applications: [:logger, :prometheus_ex, :accept, :plug]]
   end
 
   defp description do

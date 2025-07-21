@@ -27,7 +27,7 @@ defmodule Prometheus.PlugPipelineInstrumenter do
 
   Currently maintains two metrics.
 
-    * `:http_requests_total` - Total nubmer of HTTP requests made. This one is a counter.
+    * `:http_request_total` - Total nubmer of HTTP requests made. This one is a counter.
     * `:http_request_duration_<duration_unit>` - The HTTP request latencies in
       <duration_unit>. This one is a histogram.
 
@@ -121,7 +121,7 @@ defmodule Prometheus.PlugPipelineInstrumenter do
 
       def setup() do
         Counter.declare(
-          name: :http_requests_total,
+          name: :http_request_total,
           help: "Total number of HTTP requests made.",
           labels: unquote(nlabels),
           registry: unquote(registry)
@@ -132,6 +132,20 @@ defmodule Prometheus.PlugPipelineInstrumenter do
           help: "The HTTP request latencies in #{unquote(duration_unit)}.",
           labels: unquote(nlabels),
           buckets: unquote(request_duration_buckets),
+          registry: unquote(registry)
+        )
+
+        Counter.declare(
+          name: :http_request_size,
+          help: "Total size in bytes of HTTP request made.",
+          labels: unquote(nlabels),
+          registry: unquote(registry)
+        )
+
+        Counter.declare(
+          name: :http_response_size,
+          help: "Total size in bytes of HTTP response made.",
+          labels: unquote(nlabels),
           registry: unquote(registry)
         )
       end
@@ -147,12 +161,12 @@ defmodule Prometheus.PlugPipelineInstrumenter do
 
           Counter.inc(
             registry: unquote(registry),
-            name: :http_requests_total,
+            name: :http_request_total,
             labels: labels
           )
 
           stop = :erlang.monotonic_time()
-          diff = stop - start
+          diff = convert_time_unit(stop - start, unquote(:"#{duration_unit}"))
 
           Histogram.observe(
             [
@@ -163,8 +177,43 @@ defmodule Prometheus.PlugPipelineInstrumenter do
             diff
           )
 
+          req_size = conn |> Utils.request_size()
+          resp_size = conn |> Utils.response_size()
+          :prometheus_counter.inc(unquote(registry), :http_request_size, labels, req_size)
+          :prometheus_counter.inc(unquote(registry), :http_response_size, labels, resp_size)
+
           conn
         end)
+      end
+
+      @spec convert_time_unit(
+              integer(),
+              :microseconds | :milliseconds | :seconds | :minutes | :hours | :days
+            ) :: integer()
+      defp convert_time_unit(native_diff, duration_unit) do
+        case duration_unit do
+          :microseconds ->
+            :erlang.convert_time_unit(native_diff, :native, :microsecond)
+
+          :milliseconds ->
+            :erlang.convert_time_unit(native_diff, :native, :millisecond)
+
+          :seconds ->
+            :erlang.convert_time_unit(native_diff, :native, :second)
+
+          :minutes ->
+            :erlang.convert_time_unit(native_diff, :native, :second) |> Kernel./(60) |> round()
+
+          :hours ->
+            :erlang.convert_time_unit(native_diff, :native, :second)
+            |> Kernel./(60 * 60)
+            |> round()
+
+          :days ->
+            :erlang.convert_time_unit(native_diff, :native, :second)
+            |> Kernel./(60 * 60 * 24)
+            |> round()
+        end
       end
     end
   end
