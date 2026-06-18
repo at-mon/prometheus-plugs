@@ -8,7 +8,7 @@ defmodule PrometheusPlugs.Mixfile do
     [
       app: :prometheus_plugs,
       version: @version,
-      elixir: "~> 1.18",
+      elixir: "~> 1.19",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -52,11 +52,9 @@ defmodule PrometheusPlugs.Mixfile do
   defp deps do
     [
       {:accept, "~> 0.3"},
-      {:plug, "~> 1.18"},
+      {:plug, "~> 1.19"},
       {:prometheus, "~> 5.1", override: true},
       {:prometheus_ex, "~> 4.0", override: true},
-      {:prometheus_process_collector, "~> 1.6", optional: true},
-      {:earmark, ">= 0.0.0", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end

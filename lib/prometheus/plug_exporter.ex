@@ -51,8 +51,6 @@ defmodule Prometheus.PlugExporter do
   ```
   """
 
-  require Logger
-
   use Prometheus.Metric
 
   use Prometheus.Config,

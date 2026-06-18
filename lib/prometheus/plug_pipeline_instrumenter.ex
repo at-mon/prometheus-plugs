@@ -92,8 +92,6 @@ defmodule Prometheus.PlugPipelineInstrumenter do
 
   ## TODO: instrumenter for single plug(decorator)
 
-  require Logger
-
   require Prometheus.Contrib.HTTP
 
   use Prometheus.Metric

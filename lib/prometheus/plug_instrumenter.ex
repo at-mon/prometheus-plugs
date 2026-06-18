@@ -91,7 +91,6 @@ defmodule Prometheus.PlugInstrumenter do
   you also have to override buckets.
   """
 
-  require Logger
   require Prometheus.Contrib.HTTP
 
   use Prometheus.Config,
